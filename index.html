@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="RAVEN: Resilient Aerial Navigation via Open-Set Semantic Memory and Behavior Adaptation">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RAVEN: Aerial Semantic Navigation</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-26LSMFKDDQ"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-26LSMFKDDQ');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <script type="module" src="https://gradio.s3-us-west-2.amazonaws.com/4.36.1/gradio.js"></script>
+  <style>
+    .line-height-adjust {
+            line-height: 1.1;
+        }
+
+        .button-shadow {
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+    .blockMobile {
+      display: none; /* Hide the component by default */
+    }
+
+    .image-overlay {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateX(30%) translateY(-50%);
+  }
+
+    @media only screen and (min-width: 768px) {
+      .blockMobile {
+        display: block; /* Show the component for screen width 768px and above (desktop) */
+      }
+    }
+
+    .showMobile {
+      display: none; /* Hide the component by default */
+    }
+
+    .bar-image {
+      max-width: 100px;
+      height: auto;
+    }
+
+    @media only screen and (max-width: 768px) {
+      .showMobile {
+        display: block; /* Show the component for screen width 768px and above (desktop) */
+      }
+
+      .image-overlay {
+      position: relative; /* Move the image below the text */
+      top: 0;
+      transform: none; /* Remove vertical centering */
+      margin-top: 20px; /* Space between text and image */
+      margin-right: 0; /* Remove right alignment */
+    }
+
+    .bar-image {
+      display: none;
+    }
+    }
+
+    #dynamic-content {
+  position: relative; /* Ensure the content sections are positioned relative to this container */
+  min-height: 200px; /* Optional: Set a minimum height to prevent collapsing before content is displayed */
+    }
+
+    #dynamic-content .content-section {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    #dynamic-content .content-section.active {
+      opacity: 1;
+      visibility: visible;
+      position: relative; /* Allow active content to influence the height of #dynamic-content */
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+        <a class="navbar-item" href="https://mapex-explorer.github.io/">
+          <span class="icon">
+            <i class="fas fa-home"></i>
+          </span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-3 publication-title">RAVEN: Resilient Aerial Navigation via <br>Open-Set Semantic Memory and Behavior Adaptation</h1>
+            <h3 class="is-size-5 has-text-weight-bold" style="color: orange;">
+              Under Review at ICRA 2026
+            </h3>
+            <br>
+            <div class="is-size-6 publication-authors">
+              <span class="author-block">
+                <a href="https://seungchan-kim.github.io" target="_blank">Seungchan Kim</a><sup>1</sup>,</span>
+              <span class="author-block">
+                <a href="https://www.linkedin.com/in/omaralama/" target="_blank">Omar Alama</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="" target="_blank">Dmytro Kurdydyk</a><sup>2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://theairlab.org/team/johnk/" target="_blank">John Keller</a><sup>1</sup>,
+              </span>
+              <br>
+              <span class="author-block">
+                <a href="https://nik-v9.github.io/" target="_blank">Nikhil Keetha</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://theairlab.org/team/wenshan/" target="_blank">Wenshan Wang</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="" target="_blank">Yonatan Bisk</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://theairlab.org/team/sebastian/" target="_blank">Sebastian Scherer</a><sup>1</sup>
+              </span>
+            </div>
+
+            <div class="is-size-6 publication-authors">
+              <span class="author-block"><sup>1</sup>Carnegie Mellon University</span>
+              <br>
+              <span class="author-block"><sup>2</sup>Davidson College</span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <!-- PDF Link. -->
+                <span class="link-block">
+                  <a href="" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+                <!-- Code Link. -->
+                <span class="link-block">
+                  <a href=""
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+                <!-- Video Link. -->
+                <span class="link-block">
+                  <a href="" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="far fa-images"></i>
+                    </span>
+                    <span>Video</span>
+                  </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero abstract_fig">
+    <div class="container is-max-desktop">
+      <div class="hero-body has-text-centered">
+        <img src="assets/intro-raven.gif" class="is-fullwidth"/>
+        <h5 class="subtitle has-text-centered">
+          We present RAVEN, a 3D open-set memory-based behavior tree framework for aerial semantic outdoor navigation. 
+          RAVEN not only navigates reliably toward detected targets, but also performs long-range reasoning to plan toward distant cues and 
+          continues informed search even when direct visual evidence is limited. 
+        </h5>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <!-- Abstract. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Aerial outdoor semantic navigation requires robots to explore large, unstructured environments to locate target objects. Recent advances in semantic navigation have demonstrated open-set object-goal navigation in indoor 
+              settings, but these methods remain limited by constrained spatial ranges and structured layouts, making them unsuitable for long-range outdoor search. While outdoor semantic navigation approaches exist, they either rely on
+              reactive policies based on current observations, which tend to produce short-sighted behaviors, or precompute scene graphs offline for navigation, limiting adaptability to online deployment. 
+              We present RAVEN, a 3D memory-based, behavior tree framework for aerial semantic navigation in unstructured outdoor environments. 
+              It (1) uses a spatially consistent semantic voxel-ray map as persistent memory, enabling long-horizon planning and avoiding purely reactive behaviors, 
+              (2) combines short-range voxel search andlong-range ray search to scale to large environments, (3) leverages a large vision-language model to suggest auxiliary cues, mitigating sparsity of outdoor targets. 
+              These components are coordinated by a behavior tree, which adaptively switches behaviors for robust operation. 
+              We evaluate RAVEN in 10 photorealistic outdoor simulation environments over 100 semantic tasks, encompassing single-object search, multi-class, multi-instance 
+              navigation and sequential task changes. Results show RAVEN outperforms baselines by 85.25% in simulation and demonstrate its real-world applicability through deployment on an aerial robot in outdoor field tests. 
+            </p>
+          </div>
+        </div>
+      </div>
+      <!--/ Abstract. -->
+    </div>
+  </section>
+
+  <section class="hero is-small">
+    <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Overview of RAVEN: Resilient Aerial Voxel-Ray Empowered Navigation</h2>
+          <div class="content has-text-justified">
+            <img source src="assets/raven_BT.png" />
+            <p>
+            From image, depth, and pose inputs, the mapper builds an open-set 3D semantic voxel-ray map that serves as persistent memory. 
+            A behavior tree adapts the robot's actions: it performs semantic voxel-based search when reliable cues exist within depth range, 
+            switches to semantic ray-based search when only long-range directional hints are available, invokes an LVLM to suggest auxiliary objects 
+            when no target is visible, and defaults to frontier-based exploration if all strategies fail.
+            </p>
+          </div>
+        </div>
+      </div>
+      </div>
+  </section>
+
+  <section class="hero is-small">
+    <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Semantic Voxel-based Search</h2>
+          <div class="content has-text-justified">
+            <p>
+            Semantic voxel-based search is prioritized first, as nearby objects within depth range provide the most reliable semantic cues.
+            </p>
+            <video controls autoplay loop muted width="100%">
+              <source src="assets/sem-voxel.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      </div>
+  </section>
+
+  <section class="hero is-small">
+    <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Semantic Ray-based Search</h2>
+          <div class="content has-text-justified">
+            <p>
+            Semantic ray-based search is used when voxel cues are insufficient. RAVEN uses semantic ray-based search when there are distant observations that can offer long-range coarse guidance.
+            </p>
+            <video controls autoplay loop muted width="100%">
+              <source src="assets/sem-ray.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      </div>
+  </section>
+
+  <section class="hero is-small">
+    <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">LVLM-guided Search</h2>
+          <div class="content has-text-justified">
+            <img source src="assets/lvlm-search.png" />
+            <p>
+            When both semantic voxel and ray searches fail, RAVEN invokves LVLM guided search, which provides auxiliary object cues to find the targets.
+            </p>
+          </div>
+        </div>
+      </div>
+      </div>
+  </section>
+
+  <section class="hero is-small">
+    <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Semantic Voxels and Rays are Task-Agnostic and Persistent 3D Memory</h2>
+          <div class="content has-text-justified">
+            <p>
+            Open-set semantic voxel-ray map serves as 3D memory, and it is task-agnostic; no predefined queries are needed during mapping, and the task can even change on the fly. 
+            When a new task arises, the robot can align the new query with the existing voxel-ray memory using a similarity score to select relevant voxels and rays.
+            This enables our memory to support dynamic task-switching scenario during the mission. For example, when the first task ("radio tower") is given, it builds a memory that is agnostic to the second task. 
+            Upon introduction of the second task ("bridge"), it then queries the existing memory and uses highlighted cues to guide search, without rebuilding the map.
+            </p>
+            <video controls autoplay loop muted width="100%">
+              <source src="assets/task-switching.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      </div>
+  </section>
+
+  <section class="hero is-small">
+    <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Outdoor Semantic Navigation Benchmark</h2>
+          <div class="content has-text-justified">
+            <p>
+            We designed 10 outdoor semantic navigation benchmarks comprising 100 semantic object-goal tasks using the Isaac Sim simulator, 
+            and evaluated our method and baselines on this benchmark.
+            </p>
+            <video controls autoplay loop muted width="100%">
+              <source src="assets/benchmark.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      </div>
+  </section>
+  
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Simulation Experiments</h2>
+            <div class="buttons is-centered">
+              <button class="button is-primary line-height-adjust button-shadow" onclick="showContent(4,2)">Trajectory Comparison</button>
+              <button class="button is-primary line-height-adjust button-shadow" onclick="showContent(5,2)">Multi-Class Scenario</button>
+              <button class="button is-link button-shadow" onclick="showContent(6,2)">Metrics</button>
+            </div>
+            <div id="dynamic-content">
+              <div class="content-section active" id="content-2-4">
+                <div class="content has-text-justified">
+                  <p>
+                  The map-free FPV+LVLM relies only on recent FPV frames and LVLM prompts; without a consistent map it produces a reactive, meandering path, resulting in low efficiency. 
+                  VLFM-3D benefits from a value map obtained by projecting similarity scores onto frontiers, which allows eventual goal finding; 
+                  however, its motion remains myopic, repeatedly chasing the momentary maximum in the value map and yielding an unstable trajectory. 
+                  In contrast, RAVEN activates semantic rays as soon as the fuel tank is briefly captured in an RGB image and travels nearly straight to the goal, producing a highly efficient path.  
+                  </p>
+                  <img src="assets/traj-compare.png" alt="traj-compare" />
+                </div>
+              </div>
+              <div class="content-section" id="content-2-5">
+                <div class="content has-text-justified">
+                  <p>
+                   Starting with empty memory and failing voxel-ray search, the robot invokes LVLM, which suggests sidewalks and building as auxiliary cues for bankomats. 
+                   Following rays pointing sidewalk, it finds the bankomats, turns back, spots and navigates to the cafe tables.  
+                  </p>
+                  <img src="assets/multi-class.png" alt="multi-class" />
+                </div>
+              </div>
+              <div class="content-section" id="content-2-6">
+                <div class="content has-text-justified">
+                  <p></p>
+                  <img src="assets/metrics.png" alt="metrics" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero is-small">
+    <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Real-Robot Experiments</h2>
+          <div class="content has-text-justified">
+            <video controls autoplay loop muted width="100%">
+              <source src="assets/real-robot.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      </div>
+  </section>
+
+
+
+
+  <section class="hero is-small is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Acknowledgments</h2>
+          <div class="content has-text-centered">
+            <p>
+              This work was supported by Defense Science and Technology Agency (DSTA) under Contract \#DST000EC124000205. 
+              Omar Alama is partially funded by King Abdulaziz University. 
+              We thank Andrew Jong for his dedicated contributions to the development of the core autonomy stack. 
+            </p>
+          </div>
+        </div>
+      </div>
+  </section>
+
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>
+      </code></pre>
+    </div>
+  </section>
+
+  <style>
+    #blocks {
+        width:100%;
+        height:60px;
+        margin:0 auto;
+    }
+    #block1 {
+        height:33.33%;
+        width:30%;
+        float: left;
+    }
+    #block2 {
+        height:33.33%;
+        width:40%;
+        float: left;
+    }
+    #block3 {
+        height:33.33%;
+        width:30%;
+        float: right;
+    }
+  </style>
+  
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="content has-text-centered">
+        <a class="icon-link" href="">
+          <i class="fas fa-file-pdf"></i>
+        </a>
+        <a class="icon-link" href="" class="external-link" disabled>
+          <i class="fab fa-github"></i>
+        </a>
+      </div>
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This website is adapted from the Nerfies template, which is licensed under a <a rel="license"
+                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+                Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+            <p>
+              If you use the <a href="https://github.com/MapItAnywhere/MapItAnywhere.github.io">source code</a> of this
+              website, please also link back to the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies
+                source code</a> in your footer.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<script>
+  function showContent(option,section) {
+      // Remove the active class from all sections
+      // const parentContainer = document.getElementById(`dynamic-content-${section}`);
+
+      const button = event.target;
+      const parentContainer = button.closest(".hero");
+
+      // Remove the active class from all content sections within this container
+      const sections = parentContainer.querySelectorAll(".content-section");
+      sections.forEach(contentSection => {
+        contentSection.classList.remove("active");
+      });
+
+      // Add the active class to the selected section
+      const selectedSection = document.getElementById(`content-${section}-${option}`);
+      if (selectedSection) {
+        selectedSection.classList.add("active");
+      }
+    }
+</script>
+
+</body>
+
+</html>
